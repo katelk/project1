@@ -1,4 +1,10 @@
 from PIL import Image
+mode = int(input('mode:')) 
+image = Image.open("temp.jpg")
+draw = ImageDraw.Draw(image) 
+width = image.size[0] 
+height = image.size[1] 	
+pix = image.load()
 -------------------------------
 import sys
 from PyQt5.QtWidgets import QApplication, QWidget, QPushButton, QLineEdit, QLabel
