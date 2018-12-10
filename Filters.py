@@ -1,1 +1,1 @@
-print('Helo')
+from PIL import Image
