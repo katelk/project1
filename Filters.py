@@ -1,4 +1,5 @@
 from PIL import Image
+import sys
 import os
 from PyQt5.QtWidgets import QApplication, QWidget, QPushButton, QLineEdit, QLabel
 from PyQt5.QtGui import QPixmap
