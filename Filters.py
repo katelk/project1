@@ -52,12 +52,12 @@ class Example(QWidget):
         
         self.btn2 = QPushButton('Черно-белый', self)
         self.btn2.resize(self.btn2.sizeHint())
-        self.btn2.clicked.connect(self.black_whight)
+        self.btn2.clicked.connect(self.black_white)
         hbox.addWidget(self.btn2)
         
         self.move(300, 200)
         self.show() 
-    def black_whight(self):
+    def black_white(self):
         im2 = Image.open("j.jpg")
         pixels = im2.load()
         x, y = im2.size   
