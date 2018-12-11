@@ -50,10 +50,10 @@ class Example(QWidget):
         hbox.addWidget(self.lbl)
         self.setLayout(hbox)
         
-        self.btn2 = QPushButton('Черно-белый', self)
-        self.btn2.resize(self.btn2.sizeHint())
-        self.btn2.clicked.connect(self.black_white)
-        hbox.addWidget(self.btn2)
+        self.btn_black_white = QPushButton('Черно-белый', self)
+        self.btn_black_white.resize(self.btn2.sizeHint())
+        self.btn_black_white.clicked.connect(self.black_white)
+        hbox.addWidget(self.btn_black_white)
         
         self.move(300, 200)
         self.show() 
