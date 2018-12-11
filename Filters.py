@@ -1,6 +1,6 @@
 from PIL import Image
-import sys
 import os
+import sys
 from PyQt5.QtWidgets import QApplication, QWidget, QPushButton, QLineEdit, QLabel
 from PyQt5.QtGui import QPixmap
 from PyQt5.QtWidgets import (QWidget, QLabel, QApplication, QVBoxLayout)
@@ -33,12 +33,12 @@ class Example(QWidget):
         
     def action(self):
         hbox = QVBoxLayout(self)
+        file = self.name_file_input.text()
         self.label1.deleteLater()
         self.label2.deleteLater()
-        self.btn.deleteLater()
-        
+        self.btn.deleteLater()  
         self.name_file_input.deleteLater()
-        file = self.name_file_input.text()
+
         im = Image.open(file)
         im.thumbnail([500,500],Image.ANTIALIAS)
         im.save("j.jpg")
@@ -51,7 +51,7 @@ class Example(QWidget):
         self.setLayout(hbox)
         
         self.btn_black_white = QPushButton('Черно-белый', self)
-        self.btn_black_white.resize(self.btn2.sizeHint())
+        self.btn_black_white.resize(self.btn_black_white.sizeHint())
         self.btn_black_white.clicked.connect(self.black_white)
         hbox.addWidget(self.btn_black_white)
         
@@ -74,4 +74,3 @@ if __name__ == '__main__':
     ex = Example()
     ex.show()
     sys.exit(app.exec())
-
