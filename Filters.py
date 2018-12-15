@@ -3,7 +3,7 @@ import os
 import sys
 import random
 from PyQt5.QtWidgets import QApplication, QWidget, QPushButton, QLineEdit, QLabel
-from PyQt5.QtGui import QPixmap
+from PyQt5.QtGui import QPixmap, QIcon, QPalette, QColor
 from PyQt5.QtWidgets import (QWidget, QLabel, QApplication, QVBoxLayout)
 from PyQt5.QtWidgets import QInputDialog
 
@@ -13,8 +13,19 @@ class Example(QWidget):
         self.initUI()
  
     def initUI(self):
-        self.setGeometry(300, 300, 260, 100)
+        self.resize(1000, 640)
         self.setWindowTitle('Редактор фотографий')
+        
+        icon = QIcon('rl.bmp')
+        self.setWindowIcon(icon)
+        
+        pal = self.palette()
+        pal.setColor(QPalette.Normal, QPalette.Window, QColor('#FADADD')) 
+        self.setPalette(pal)
+        pal.setColor(QPalette.Disabled, QPalette.Window, QColor('#FADADD')) 
+        self.setPalette(pal)
+        pal.setColor(QPalette.Inactive, QPalette.Window, QColor('#FADADD')) 
+        self.setPalette(pal) 
         
         self.label1 = QLabel(self)
         self.label1.setText("Добро пожаловать в редактор фотографий!")
@@ -92,15 +103,17 @@ class Example(QWidget):
         self.btn_noises.clicked.connect(self.noises)
         hbox.addWidget(self.btn_noises)
         
-        self.btn_negative = QPushButton('Цвета', self)
-        self.btn_negative.resize(self.btn_negative.sizeHint())
-        self.btn_negative.clicked.connect(self.negative)
-        hbox.addWidget(self.btn_negative)
+        self.btn_color = QPushButton('Цвета', self)
+        self.btn_color.resize(self.btn_color.sizeHint())
+        #self.btn_color.clicked.connect(self.color)
+        hbox.addWidget(self.btn_color)
         
-        self.btn_negative = QPushButton('Сохранить', self)
-        self.btn_negative.resize(self.btn_negative.sizeHint())
-        self.btn_negative.clicked.connect(self.negative)
-        hbox.addWidget(self.btn_negative)
+        self.btn_save = QPushButton(self)
+        self.btn_save.setIcon(QIcon('save.bmp'))
+        self.btn_save.resize(self.btn_save.sizeHint())
+        self.btn_save.setToolTip('Сохранить')
+        #self.btn_save.clicked.connect(self.save)
+        hbox.addWidget(self.btn_save)
         
         self.move(300, 200)
         self.show() 
