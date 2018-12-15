@@ -2,12 +2,11 @@ from PIL import Image, ImageEnhance
 import os
 import sys
 import random
-from PyQt5.QtWidgets import QApplication, QWidget, QPushButton, QLineEdit, QLabel
+import sys
+from PyQt5.QtWidgets import QMainWindow, QAction, QApplication, QWidget, QPushButton, QLineEdit, QLabel, QMainWindow, QVBoxLayout, QInputDialog, QFileDialog
 from PyQt5.QtGui import QPixmap, QIcon, QPalette, QColor
-from PyQt5.QtWidgets import (QWidget, QLabel, QApplication, QVBoxLayout)
-from PyQt5.QtWidgets import QInputDialog
 
-class Example(QWidget):
+class Widget(QWidget):
     def __init__(self):
         super().__init__()
         self.initUI()
@@ -15,17 +14,6 @@ class Example(QWidget):
     def initUI(self):
         self.resize(1000, 640)
         self.setWindowTitle('Редактор фотографий')
-        
-        icon = QIcon('rl.bmp')
-        self.setWindowIcon(icon)
-        
-        pal = self.palette()
-        pal.setColor(QPalette.Normal, QPalette.Window, QColor('#FADADD')) 
-        self.setPalette(pal)
-        pal.setColor(QPalette.Disabled, QPalette.Window, QColor('#FADADD')) 
-        self.setPalette(pal)
-        pal.setColor(QPalette.Inactive, QPalette.Window, QColor('#FADADD')) 
-        self.setPalette(pal) 
         
         self.label1 = QLabel(self)
         self.label1.setText("Добро пожаловать в редактор фотографий!")
@@ -258,8 +246,64 @@ class Example(QWidget):
         pixmap = QPixmap("j.jpg")
         self.lbl.setPixmap(pixmap)    
         
+class Example(QMainWindow):
+        
+    def __init__(self):
+        super().__init__()
+        self.initUI()
+        
+    def initUI(self):
+        
+        MainWidget = Widget()
+        self.setCentralWidget(MainWidget)
+        self.statusBar()
+        
+        icon = QIcon('rl.bmp')
+        self.setWindowIcon(icon)
+        
+        pal = self.palette()
+        pal.setColor(QPalette.Normal, QPalette.Window, QColor('#FADADD')) 
+        self.setPalette(pal)
+        pal.setColor(QPalette.Disabled, QPalette.Window, QColor('#FADADD')) 
+        self.setPalette(pal)
+        pal.setColor(QPalette.Inactive, QPalette.Window, QColor('#FADADD')) 
+        self.setPalette(pal) 
+        
+        exitAction = QAction(QIcon('exit24.png'), 'Exit', self)
+        exitAction.setShortcut('Ctrl+Q')
+        exitAction.setStatusTip('Exit application')
+        exitAction.triggered.connect(self.close)
+        
+        openFile = QAction(QIcon('open.png'), 'Open', self)
+        openFile.setShortcut('Ctrl+O')
+        openFile.setStatusTip('Open new File')
+        openFile.triggered.connect(self.showOpenDialog)
+        
+        saveFile = QAction(QIcon('open.png'), 'Save', self)
+        saveFile.setShortcut('Ctrl+S')
+        saveFile.setStatusTip('Save File')
+        saveFile.triggered.connect(self.showSaveDialog)        
+        
+        menubar = self.menuBar()
+        fileMenu = menubar.addMenu('&File')
+        fileMenu.addAction(exitAction)
+        fileMenu.addAction(openFile)
+        fileMenu.addAction(saveFile)
+        
+        self.resize(1000, 640)
+        self.setWindowTitle('Main window')
+        self.show()
+    def showOpenDialog(self):
+        fname = QFileDialog().getOpenFileName(self, 'Открыть файл', '/home', "Images (*.png *.xpm *.jpg);;Text files (*.txt);;XML files (*.xml)")[0]
+        f = open(fname, 'r')
+        with f:
+            data = f.read()
+    def showSaveDialog(self):
+        fileName = QFileDialog.getSaveFileName(self , "Сохранить файл"  , "1.jpg",  "Images (*.png *.xpm *.jpg);;Text files (*.txt);;XML files (*.xml)")
+        
+
 if __name__ == '__main__':
+        
     app = QApplication(sys.argv)
     ex = Example()
-    ex.show()
-    sys.exit(app.exec())
+    sys.exit(app.exec_())  
