@@ -108,7 +108,7 @@ class Example(QWidget):
     
     def brightness(self):
         factor, okBtnPressed = QInputDialog.getInt(
-            self, "Яркость", " ", 0, -100, 100, 1
+            self, "Яркость", "Введите желаемый показатель яркости", 0, -100, 100, 1
         )
         if okBtnPressed:
             im2 = Image.open("j.jpg")
