@@ -102,10 +102,10 @@ class Widget(QWidget):
         self.btn_noises.clicked.connect(self.noises)
         third_hbox.addWidget(self.btn_noises)
         
-        self.btn_color = QPushButton('Цвета', self)
-        self.btn_color.resize(self.btn_color.sizeHint())
-        #self.btn_color.clicked.connect(self.color)
-        third_hbox.addWidget(self.btn_color)
+        self.btn_anaglif = QPushButton('Анаглиф', self)
+        self.btn_anaglif.resize(self.btn_anaglif.sizeHint())
+        self.btn_anaglif.clicked.connect(self.anaglif)
+        third_hbox.addWidget(self.btn_anaglif)
         
         self.btn_save = QPushButton(self)
         self.btn_save.setIcon(QIcon('save.bmp'))
@@ -118,6 +118,21 @@ class Widget(QWidget):
         self.move(300, 200)
         self.show() 
     
+    def anaglif(self):
+        im2 = self.image_first
+        pixels = im2.load()
+        x, y = im2.size
+        for i in range(y):
+            for j in list(reversed(range(x))):
+                r2, g,b = pixels[j, i]
+                pixels[j,i] = 0,g,b
+                q = j+5
+                if q<x:
+                    r,g,b = pixels[q,i]
+                    pixels[q,i] = r2,g,b
+        self.image_second = self.image_first.copy()
+        self.lbl.setPixmap(showPicture(self.image_second)) 
+        
     def brightness(self):
         factor, okBtnPressed = QInputDialog.getInt(self, "Яркость", "Введите желаемый показатель яркости", 0, -100, 100, 1)
         if okBtnPressed:
