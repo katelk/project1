@@ -3,8 +3,16 @@ import os
 import sys
 import random
 import sys
-from PyQt5.QtWidgets import QMainWindow, QAction, QApplication, QWidget, QPushButton, QLineEdit, QLabel, QMainWindow, QVBoxLayout, QInputDialog, QFileDialog
-from PyQt5.QtGui import QPixmap, QIcon, QPalette, QColor
+from PyQt5.QtWidgets import QMainWindow, QAction, QApplication, QWidget, QPushButton, QLineEdit, QLabel, QMainWindow, QInputDialog, QFileDialog, QHBoxLayout, QVBoxLayout
+from PyQt5.QtGui import QPixmap, QIcon, QPalette, QColor, QFont, QBrush
+
+def showPicture(image):
+    im = image.copy()
+    im.thumbnail([500,500],Image.ANTIALIAS)
+    im.save("j.jpg")
+    pixmap = QPixmap("j.jpg") 
+    os.remove("j.jpg")
+    return pixmap 
 
 class Widget(QWidget):
     def __init__(self):
@@ -16,15 +24,14 @@ class Widget(QWidget):
         self.setWindowTitle('Редактор фотографий')
         
         self.label1 = QLabel(self)
-        self.label1.setText("Добро пожаловать в редактор фотографий!")
-        self.label1.move(20, 8)
+        self.label1.setText("Добро пожаловать в редактор ")
+        self.label1.setFont(QFont("Calibri", 35, QFont.Bold))
+        self.label1.move(185, 40)
         
         self.label2 = QLabel(self)
-        self.label2.setText("Для начала работы введите имя файла:")
-        self.label2.move(25, 25)
-        
-        self.name_file_input = QLineEdit(self)
-        self.name_file_input.move(60, 45)
+        self.label2.setText("фотографий RESHEL!")
+        self.label2.setFont(QFont("Calibri", 35, QFont.Bold))
+        self.label2.move(265, 100)
         
         self.btn = QPushButton('Приступить к работе', self)
         self.btn.resize(self.btn.sizeHint())
@@ -32,86 +39,85 @@ class Widget(QWidget):
         self.btn.clicked.connect(self.action)
         
     def action(self):
-        hbox = QVBoxLayout(self)
-        file = self.name_file_input.text()
+        main_vbox = QVBoxLayout()
+        
         self.label1.deleteLater()
         self.label2.deleteLater()
         self.btn.deleteLater()  
-        self.name_file_input.deleteLater()
-
-        im = Image.open(file)
-        im.thumbnail([500,500],Image.ANTIALIAS)
-        im.save("j.jpg")
-        pixmap = QPixmap("j.jpg")
-        #os.remove("j.jpg")
         
         self.lbl = QLabel(self)
-        self.lbl.setPixmap(pixmap)
-        hbox.addWidget(self.lbl)
-        self.setLayout(hbox)
+        main_vbox.addWidget(self.lbl)
+        
+        first_hbox = QHBoxLayout()
+        main_vbox.addLayout(first_hbox)
         
         self.btn_horizontal_reflection = QPushButton('Отразить по горизонтали', self)
         self.btn_horizontal_reflection.resize(self.btn_horizontal_reflection.sizeHint())
         self.btn_horizontal_reflection.clicked.connect(self.horizontal_reflection)
-        hbox.addWidget(self.btn_horizontal_reflection)
+        first_hbox.addWidget(self.btn_horizontal_reflection)
         
         self.btn_vertical_reflection = QPushButton('Отразить по вертикали', self)
         self.btn_vertical_reflection.resize(self.btn_vertical_reflection.sizeHint())
         self.btn_vertical_reflection.clicked.connect(self.vertical_reflection)
-        hbox.addWidget(self.btn_vertical_reflection)
+        first_hbox.addWidget(self.btn_vertical_reflection)
         
         self.btn_black_white = QPushButton('Черно-белый', self)
         self.btn_black_white.resize(self.btn_black_white.sizeHint())
         self.btn_black_white.clicked.connect(self.black_white)
-        hbox.addWidget(self.btn_black_white)
+        first_hbox.addWidget(self.btn_black_white)
+        
+        second_hbox = QHBoxLayout()
+        main_vbox.addLayout(second_hbox)
         
         self.btn_negative = QPushButton('Негатив', self)
         self.btn_negative.resize(self.btn_negative.sizeHint())
         self.btn_negative.clicked.connect(self.negative)
-        hbox.addWidget(self.btn_negative)
+        second_hbox.addWidget(self.btn_negative)
         
         self.btn_contrast = QPushButton('Контрастность', self)
         self.btn_contrast.resize(self.btn_contrast.sizeHint())
         self.btn_contrast.clicked.connect(self.contrast)
-        hbox.addWidget(self.btn_contrast)
+        second_hbox.addWidget(self.btn_contrast)
         
         self.btn_saturation = QPushButton('Насыщенность', self)
         self.btn_saturation.resize(self.btn_saturation.sizeHint())
         self.btn_saturation.clicked.connect(self.saturation)
-        hbox.addWidget(self.btn_saturation)
+        second_hbox.addWidget(self.btn_saturation)
+        
+        third_hbox = QHBoxLayout()
+        main_vbox.addLayout(third_hbox)
         
         self.btn_brightness = QPushButton(self)
         self.btn_brightness.setText("Яркость")
         self.btn_brightness.resize(self.btn_brightness.sizeHint())
         self.btn_brightness.clicked.connect(self.brightness)
-        hbox.addWidget(self.btn_brightness)
+        third_hbox.addWidget(self.btn_brightness)
         
         self.btn_noises = QPushButton('Зернистость', self)
         self.btn_noises.resize(self.btn_noises.sizeHint())
         self.btn_noises.clicked.connect(self.noises)
-        hbox.addWidget(self.btn_noises)
+        third_hbox.addWidget(self.btn_noises)
         
         self.btn_color = QPushButton('Цвета', self)
         self.btn_color.resize(self.btn_color.sizeHint())
         #self.btn_color.clicked.connect(self.color)
-        hbox.addWidget(self.btn_color)
+        third_hbox.addWidget(self.btn_color)
         
         self.btn_save = QPushButton(self)
         self.btn_save.setIcon(QIcon('save.bmp'))
         self.btn_save.resize(self.btn_save.sizeHint())
         self.btn_save.setToolTip('Сохранить')
         #self.btn_save.clicked.connect(self.save)
-        hbox.addWidget(self.btn_save)
+        #self.btn_save.move(0, 0)
         
+        self.setLayout(main_vbox)
         self.move(300, 200)
         self.show() 
     
     def brightness(self):
-        factor, okBtnPressed = QInputDialog.getInt(
-            self, "Яркость", "Введите желаемый показатель яркости", 0, -100, 100, 1
-        )
+        factor, okBtnPressed = QInputDialog.getInt(self, "Яркость", "Введите желаемый показатель яркости", 0, -100, 100, 1)
         if okBtnPressed:
-            im2 = Image.open("j.jpg")
+            im2 = self.image_first
             pixels = im2.load()
             x, y = im2.size   
             for i in range(x):  
@@ -133,46 +139,41 @@ class Widget(QWidget):
                     if b1 > 255:
                         b1 = 255
                     pixels[i, j] = int(r1), int(g1), int(b1)
-            im2.save("j.jpg")
-            pixmap = QPixmap("j.jpg")
-            self.lbl.setPixmap(pixmap)
+            self.image_second = self.image_first.copy()
+            self.lbl.setPixmap(showPicture(self.image_second))
             
     def contrast(self):
         i, okBtnPressed = QInputDialog.getInt(
             self, "Контрастность", "Введите желаемый показатель контрастности", 0, -100, 100, 1
         )
         if okBtnPressed:
-            im2 = Image.open("j.jpg")
-            contrast = ImageEnhance.Contrast(im2)
+            contrast = ImageEnhance.Contrast(self.image_first)
             if i < 0:
-                im2 = contrast.enhance(1 - ((i * (-1)) / 100))
+                self.image_first = contrast.enhance(1 - ((i * (-1)) / 100))
             if i > 0:
-                im2 = contrast.enhance(1 + (i / 100))
+                self.image_first = contrast.enhance(1 + (i / 100))
             if i == 0:
-                im2 = contrast.enhance(1)
-            im2.save("j.jpg")
-            pixmap = QPixmap("j.jpg")
-            self.lbl.setPixmap(pixmap)
+                self.image_first = contrast.enhance(1)
+            self.image_second = self.image_first.copy()
+            self.lbl.setPixmap(showPicture(self.image_second))
             
     def saturation(self):
         i, okBtnPressed = QInputDialog.getInt(
             self, "Насыщенность", "Введите желаемый показатель насыщенности", 0, -100, 100, 1
         )
         if okBtnPressed:
-            im2 = Image.open("j.jpg")
-            converter = ImageEnhance.Color(im2)
+            converter = ImageEnhance.Color(self.image_first)
             if i < 0:
-                im2 = converter.enhance(1 - ((i * (-1)) / 100))
+                self.image_first = converter.enhance(1 - ((i * (-1)) / 100))
             if i > 0:
-                im2 = converter.enhance(1 + (i / 100))
+                self.image_first = converter.enhance(1 + (i / 100))
             if i == 0:
-                im2 = converter.enhance(1)
-            im2.save("j.jpg")
-            pixmap = QPixmap("j.jpg")
-            self.lbl.setPixmap(pixmap)
+                self.image_first = converter.enhance(1)
+            self.image_second = self.image_first.copy()
+            self.lbl.setPixmap(showPicture(self.image_second))
                 
     def black_white(self):
-        im2 = Image.open("j.jpg")
+        im2 = self.image_first.copy()
         pixels = im2.load()
         x, y = im2.size   
         for i in range(x):  
@@ -180,27 +181,23 @@ class Widget(QWidget):
                 r, g, b = pixels[i, j]
                 bw = (r + g + b) // 3
                 pixels[i, j] = bw, bw, bw
-        im2.save("j.jpg")
-        pixmap = QPixmap("j.jpg")
-        self.lbl.setPixmap(pixmap)
+        self.image_second = im2
+        self.lbl.setPixmap(showPicture(self.image_second))
         
     def horizontal_reflection(self):
-        im2 = Image.open("j.jpg")
-        im2 = im2.transpose(Image.FLIP_LEFT_RIGHT)
-        im2.save("j.jpg")
-        pixmap = QPixmap("j.jpg")
-        self.lbl.setPixmap(pixmap)
+        self.image_first = self.image_first.rotate(180)
+        self.image_first = self.image_first.transpose(Image.FLIP_LEFT_RIGHT)
+        self.image_second = self.image_second.rotate(180)
+        self.image_second = self.image_second.transpose(Image.FLIP_LEFT_RIGHT)        
+        self.lbl.setPixmap(showPicture(self.image_second))      
     
     def vertical_reflection(self):
-        im2 = Image.open("j.jpg")
-        im2 = im2.rotate(180)
-        im2 = im2.transpose(Image.FLIP_LEFT_RIGHT)
-        im2.save("j.jpg")
-        pixmap = QPixmap("j.jpg")
-        self.lbl.setPixmap(pixmap)        
+        self.image_first = self.image_first.transpose(Image.FLIP_LEFT_RIGHT)
+        self.image_second = self.image_second.transpose(Image.FLIP_LEFT_RIGHT)
+        self.lbl.setPixmap(showPicture(self.image_second)) 
         
     def negative(self):
-        im2 = Image.open("j.jpg")
+        im2 = self.image_first.copy()
         pixels = im2.load()
         x, y = im2.size   
         for i in range(x):  
@@ -210,16 +207,15 @@ class Widget(QWidget):
                 g1 = 255 - g
                 b1 = 255 - b
                 pixels[i, j] = r1, g1, b1
-        im2.save("j.jpg")
-        pixmap = QPixmap("j.jpg")
-        self.lbl.setPixmap(pixmap)
+        self.image_second = im2
+        self.lbl.setPixmap(showPicture(self.image_second))
     
     def noises(self):
         factor, okBtnPressed = QInputDialog.getInt(
-            self, "Зернистость", "Введите желвемый показатель зернистости", 20, 0, 100, 1
+            self, "Зернистость", "Введите желаемый показатель зернистости", 20, 0, 100, 1
         )
         if okBtnPressed:
-            im2 = Image.open("j.jpg")
+            im2 = self.image_first
             pixels = im2.load()
             x, y = im2.size   
             for i in range(x):  
@@ -242,9 +238,8 @@ class Widget(QWidget):
                     if b1 > 255:
                         b1 = 255
                     pixels[i, j] = int(r1), int(g1), int(b1)    
-        im2.save("j.jpg")
-        pixmap = QPixmap("j.jpg")
-        self.lbl.setPixmap(pixmap)    
+        self.image_second = self.image_first.copy()
+        self.lbl.setPixmap(showPicture(self.image_second))  
         
 class Example(QMainWindow):
         
@@ -254,18 +249,16 @@ class Example(QMainWindow):
         
     def initUI(self):
         
-        MainWidget = Widget()
-        self.setCentralWidget(MainWidget)
+        self.MainWidget = Widget()
+        self.setCentralWidget(self.MainWidget)
         self.statusBar()
         
         icon = QIcon('rl.bmp')
         self.setWindowIcon(icon)
         
         pal = self.palette()
-        pal.setColor(QPalette.Normal, QPalette.Window, QColor('#FADADD')) 
-        self.setPalette(pal)
-        pal.setColor(QPalette.Disabled, QPalette.Window, QColor('#FADADD')) 
-        self.setPalette(pal)
+        pal.setBrush(QPalette.Normal, QPalette.Window, QBrush(QPixmap("фон.jpg"))) 
+        pal.setColor(QPalette.Disabled, QPalette.Window, QColor('#FADADD'))
         pal.setColor(QPalette.Inactive, QPalette.Window, QColor('#FADADD')) 
         self.setPalette(pal) 
         
@@ -294,14 +287,14 @@ class Example(QMainWindow):
         self.setWindowTitle('Main window')
         self.show()
     def showOpenDialog(self):
-        fname = QFileDialog().getOpenFileName(self, 'Открыть файл', '/home', "Images (*.png *.xpm *.jpg);;Text files (*.txt);;XML files (*.xml)")[0]
-        f = open(fname, 'r')
-        with f:
-            data = f.read()
+        file = QFileDialog().getOpenFileName(self, 'Открыть файл', '/home', "Images (*.png *.xpm *.jpg);;Text files (*.txt);;XML files (*.xml)")[0]
+        self.MainWidget.image_first = Image.open(file)
+        self.MainWidget.image_second = Image.open(file)
+        self.MainWidget.lbl.setPixmap(showPicture(self.MainWidget.image_first))     
     def showSaveDialog(self):
-        fileName = QFileDialog.getSaveFileName(self , "Сохранить файл"  , "1.jpg",  "Images (*.png *.xpm *.jpg);;Text files (*.txt);;XML files (*.xml)")
-        
-
+        fileName = QFileDialog.getSaveFileName(self , "Сохранить файл"  , "6.jpg",  "*.jpg;;Text files (*.txt);;XML files (*.xml)")
+        self.MainWidget.image.save(fileName[0])
+ 
 if __name__ == '__main__':
         
     app = QApplication(sys.argv)
