@@ -1,10 +1,12 @@
 from PIL import Image, ImageEnhance
+import vk_api
+import requests
 import os
 import sys
 import random
 import sys
 from PyQt5.QtCore import QSize
-from PyQt5.QtWidgets import QMainWindow, QAction, QApplication, QWidget, QPushButton, QLineEdit, QLabel, QMainWindow, QInputDialog, QFileDialog, QHBoxLayout, QVBoxLayout, QColorDialog, QErrorMessage
+from PyQt5.QtWidgets import QMainWindow, QAction, QApplication, QWidget, QPushButton, QLineEdit, QLabel, QMainWindow, QInputDialog, QFileDialog, QHBoxLayout, QVBoxLayout, QColorDialog, QErrorMessage, QInputDialog
 from PyQt5.QtGui import QPixmap, QIcon, QPalette, QColor, QFont, QBrush
 
 def showPicture(image):
@@ -45,6 +47,17 @@ class Widget(QWidget):
     def action(self):
         main_vbox = QVBoxLayout()
         
+        nul_hbox = QHBoxLayout()
+        nul_hbox.addStretch(1)
+        main_vbox.addLayout(nul_hbox)
+        
+        self.btn_share = QPushButton(self)
+        self.btn_share.setIcon(QIcon('поделится.bmp'))
+        self.btn_share.resize(10, 10)
+        self.btn_share.setToolTip('Поделиться в вк')
+        self.btn_share.clicked.connect(self.share)
+        nul_hbox.addWidget(self.btn_share)
+        
         self.label1.deleteLater()
         self.label2.deleteLater()
         self.btn.deleteLater() 
@@ -65,59 +78,87 @@ class Widget(QWidget):
         self.btn_vertical_reflection.clicked.connect(self.vertical_reflection)
         first_hbox.addWidget(self.btn_vertical_reflection)
         
+        second_hbox = QHBoxLayout()
+        main_vbox.addLayout(second_hbox)
+        
         self.btn_black_white = QPushButton('Черно-белый', self)
         self.btn_black_white.resize(self.btn_black_white.sizeHint())
         self.btn_black_white.clicked.connect(self.black_white)
-        first_hbox.addWidget(self.btn_black_white)
-        
-        second_hbox = QHBoxLayout()
-        main_vbox.addLayout(second_hbox)
+        second_hbox.addWidget(self.btn_black_white)
         
         self.btn_negative = QPushButton('Негатив', self)
         self.btn_negative.resize(self.btn_negative.sizeHint())
         self.btn_negative.clicked.connect(self.negative)
         second_hbox.addWidget(self.btn_negative)
         
+        third_hbox = QHBoxLayout()
+        main_vbox.addLayout(third_hbox)
+        
         self.btn_contrast = QPushButton('Контрастность', self)
         self.btn_contrast.resize(self.btn_contrast.sizeHint())
         self.btn_contrast.clicked.connect(self.contrast)
-        second_hbox.addWidget(self.btn_contrast)
+        third_hbox.addWidget(self.btn_contrast)
         
         self.btn_saturation = QPushButton('Насыщенность', self)
         self.btn_saturation.resize(self.btn_saturation.sizeHint())
         self.btn_saturation.clicked.connect(self.saturation)
-        second_hbox.addWidget(self.btn_saturation)
+        third_hbox.addWidget(self.btn_saturation)
         
-        third_hbox = QHBoxLayout()
-        main_vbox.addLayout(third_hbox)
+        four_hbox = QHBoxLayout()
+        main_vbox.addLayout(four_hbox)
         
         self.btn_brightness = QPushButton(self)
         self.btn_brightness.setText("Яркость")
         self.btn_brightness.resize(self.btn_brightness.sizeHint())
         self.btn_brightness.clicked.connect(self.brightness)
-        third_hbox.addWidget(self.btn_brightness)
+        four_hbox.addWidget(self.btn_brightness)
         
         self.btn_noises = QPushButton('Зернистость', self)
         self.btn_noises.resize(self.btn_noises.sizeHint())
         self.btn_noises.clicked.connect(self.noises)
-        third_hbox.addWidget(self.btn_noises)
+        four_hbox.addWidget(self.btn_noises)
+        
+        five_hbox = QHBoxLayout()
+        main_vbox.addLayout(five_hbox)
         
         self.btn_anaglif = QPushButton('Анаглиф', self)
         self.btn_anaglif.resize(self.btn_anaglif.sizeHint())
         self.btn_anaglif.clicked.connect(self.anaglif)
-        third_hbox.addWidget(self.btn_anaglif)
+        five_hbox.addWidget(self.btn_anaglif)
         
-        self.btn_save = QPushButton(self)
-        self.btn_save.setIcon(QIcon('save.bmp'))
-        self.btn_save.resize(self.btn_save.sizeHint())
-        self.btn_save.setToolTip('Сохранить')
-        #self.btn_save.clicked.connect(self.save)
-        #self.btn_save.move(0, 0)
+        self.btn_frame = QPushButton('Рамка', self)
+        self.btn_frame.resize(self.btn_frame.sizeHint())
+        self.btn_frame.clicked.connect(self.frame)
+        five_hbox.addWidget(self.btn_frame)
         
         self.setLayout(main_vbox)
         self.move(300, 200)
         self.show() 
-    
+    def share(self):
+        login, ok1 = QInputDialog.getText(self, 'Поделиться',
+            'Введите логин:')
+        if ok1:
+            password, ok2 = QInputDialog.getText(self, 'Поделиться',
+            'Введите пароль:')
+            if ok2:
+                vk_session = vk_api.VkApi(login, password)
+                vk_session.auth()
+                vk = vk_session.get_api()
+                    
+                IMAGE_URL = vk.photos.getWallUploadServer()
+                user_id = IMAGE_URL['user_id']
+                upload_url = IMAGE_URL['upload_url']
+                
+                self.image.save("help.jpg")               
+                request = requests.post(upload_url, files={'photo': open("help.jpg", "rb")})
+                os.remove("help.jpg") 
+                params = {'server': request.json()['server'],
+                            'photo': request.json()['photo'],
+                            'hash': request.json()['hash']}
+                save = vk.photos.saveWallPhoto(**params)
+                photo_id = save[0]['id']
+                vk.wall.post(owner_id = user_id, message = '', attachments = 'photo' + str(user_id) + "_"+ str(photo_id))                    
+
     def anaglif(self):
         im2 = self.image
         pixels = im2.load()
@@ -220,6 +261,23 @@ class Widget(QWidget):
                 b1 = 255 - b
                 pixels[i, j] = r1, g1, b1
         self.lbl.setPixmap(showPicture(self.image))
+        
+    def frame(self):
+        i, okBtnPressed = QInputDialog.getInt(
+            self, "Рамка", "Введите желаемую ширину рамки, а затем ее цвет", 20, 0, 70, 1
+        )
+        if okBtnPressed:
+            color = QColorDialog.getColor()
+            if color.isValid():
+                im2 = self.image
+                im_two = im2.copy()
+                old_size = im2.size
+                x, y = im2.size
+                new_size = (x + i, y + i)
+                im2 = Image.new("RGB", new_size, color.name())
+                im2.paste(im_two, (int((new_size[0] - old_size[0]) / 2), (int((new_size[1] - old_size[1]) / 2))))
+                self.image = im2
+        self.lbl.setPixmap(showPicture(self.image))
     
     def noises(self):
         factor, okBtnPressed = QInputDialog.getInt(
@@ -250,22 +308,6 @@ class Widget(QWidget):
                         b1 = 255
                     pixels[i, j] = int(r1), int(g1), int(b1)    
         self.lbl.setPixmap(showPicture(self.image))  
-        
-        def frame(self):
-            i, okBtnPressed = QInputDialog.getInt(
-                self, "Рамка", "Введите желаемую ширину рамки, а затем ее цвет", 20, 0, 70, 1
-            )
-            if okBtnPressed:
-                color = QColorDialog.getColor()
-                if color.isValid():
-                    im2 = self.image
-                    im_two = im2.copy()
-                    old_size = im2.size
-                    x, y = im2.size
-                    new_size = (x + i, y + i)
-                    im2 = Image.new("RGB", new_size, color.name())
-                    im2.paste(im_two, (int((new_size[0] - old_size[0]) / 2), (int((new_size[1] - old_size[1]) / 2))))
-             self.lbl.setPixmap(showPicture(self.image))
         
 class Example(QMainWindow):
         
@@ -330,7 +372,7 @@ class Example(QMainWindow):
         self.pal.setBrush(QPalette.Normal, QPalette.Window, QBrush(QPixmap(file[0])))
         self.pal.setBrush(QPalette.Disabled, QPalette.Window, QBrush(QPixmap(file[0])))
         self.pal.setBrush(QPalette.Inactive, QPalette.Window, QBrush(QPixmap(file[0])))
-        self.setPalette(self.pal)
+        self.setPalette(self.pal)    
             
     def change_color_fon(self):
         col = QColorDialog.getColor()
@@ -360,4 +402,5 @@ if __name__ == '__main__':
         
     app = QApplication(sys.argv)
     ex = Example()
-    sys.exit(app.exec_())  
+    sys.exit(app.exec_())
+    
