@@ -3,6 +3,7 @@ import os
 import sys
 import random
 import sys
+from PyQt5.QtCore import QSize
 from PyQt5.QtWidgets import QMainWindow, QAction, QApplication, QWidget, QPushButton, QLineEdit, QLabel, QMainWindow, QInputDialog, QFileDialog, QHBoxLayout, QVBoxLayout, QColorDialog, QErrorMessage
 from PyQt5.QtGui import QPixmap, QIcon, QPalette, QColor, QFont, QBrush
 
@@ -33,9 +34,12 @@ class Widget(QWidget):
         self.label2.setFont(QFont("Calibri", 35, QFont.Bold))
         self.label2.move(265, 100)
         
-        self.btn = QPushButton('Приступить к работе', self)
-        self.btn.resize(self.btn.sizeHint())
-        self.btn.move(68, 70)
+        self.btn = QPushButton(self)
+        self.btn.resize(QSize(500, 100))
+        iconka = QIcon('приступить.bmp')        
+        self.btn.setIcon(iconka)
+        self.btn.setIconSize(QSize(500, 100))
+        self.btn.move(230, 300)
         self.btn.clicked.connect(self.action)        
         
     def action(self):
@@ -262,23 +266,23 @@ class Example(QMainWindow):
         self.pal.setBrush(QPalette.Inactive, QPalette.Window, QBrush(QPixmap("фон.jpg")))
         self.setPalette(self.pal) 
         
-        exitAction = QAction(QIcon('exit24.png'), 'Exit', self)
+        exitAction = QAction('Выйти', self)
         exitAction.setShortcut('Ctrl+Q')
         exitAction.setStatusTip('Exit application')
         exitAction.triggered.connect(self.close)
         
-        openFile = QAction(QIcon('open.png'), 'Open', self)
+        openFile = QAction('Открыть', self)
         openFile.setShortcut('Ctrl+O')
         openFile.setStatusTip('Open new File')
         openFile.triggered.connect(self.showOpenDialog)
         
-        saveFile = QAction(QIcon('open.png'), 'Save', self)
+        saveFile = QAction('Сохранить', self)
         saveFile.setShortcut('Ctrl+S')
         saveFile.setStatusTip('Save File')
         saveFile.triggered.connect(self.showSaveDialog)
         
-        colorAction = QAction(QIcon('exit24.png'), 'color', self)
-        colorAction.setStatusTip('color application')
+        colorAction = QAction('Изменить фон', self)
+        colorAction.setStatusTip('')
         colorAction.triggered.connect(self.colore)
         
         menubar = self.menuBar()
@@ -297,6 +301,8 @@ class Example(QMainWindow):
         col = QColorDialog.getColor()
         if col.isValid():
             self.pal.setColor(QPalette.Normal, QPalette.Window, col)
+            self.pal.setColor(QPalette.Disabled, QPalette.Window, col)
+            self.pal.setColor(QPalette.Inactive, QPalette.Window, col)
             self.setPalette(self.pal)
     def showOpenDialog(self):
         try:
