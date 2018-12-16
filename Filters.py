@@ -258,7 +258,7 @@ class Widget(QWidget):
             if okBtnPressed:
                 color = QColorDialog.getColor()
                 if color.isValid():
-                    im2 = Image.open('j.jpg')
+                    im2 = self.image
                     im_two = im2.copy()
                     old_size = im2.size
                     x, y = im2.size
