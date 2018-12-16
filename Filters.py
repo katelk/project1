@@ -3,7 +3,7 @@ import os
 import sys
 import random
 import sys
-from PyQt5.QtWidgets import QMainWindow, QAction, QApplication, QWidget, QPushButton, QLineEdit, QLabel, QMainWindow, QInputDialog, QFileDialog, QHBoxLayout, QVBoxLayout
+from PyQt5.QtWidgets import QMainWindow, QAction, QApplication, QWidget, QPushButton, QLineEdit, QLabel, QMainWindow, QInputDialog, QFileDialog, QHBoxLayout, QVBoxLayout, QColorDialog, QErrorMessage
 from PyQt5.QtGui import QPixmap, QIcon, QPalette, QColor, QFont, QBrush
 
 def showPicture(image):
@@ -36,14 +36,14 @@ class Widget(QWidget):
         self.btn = QPushButton('Приступить к работе', self)
         self.btn.resize(self.btn.sizeHint())
         self.btn.move(68, 70)
-        self.btn.clicked.connect(self.action)
+        self.btn.clicked.connect(self.action)        
         
     def action(self):
         main_vbox = QVBoxLayout()
         
         self.label1.deleteLater()
         self.label2.deleteLater()
-        self.btn.deleteLater()  
+        self.btn.deleteLater() 
         
         self.lbl = QLabel(self)
         main_vbox.addWidget(self.lbl)
@@ -256,11 +256,11 @@ class Example(QMainWindow):
         icon = QIcon('rl.bmp')
         self.setWindowIcon(icon)
         
-        pal = self.palette()
-        pal.setBrush(QPalette.Normal, QPalette.Window, QBrush(QPixmap("фон.jpg"))) 
-        pal.setColor(QPalette.Disabled, QPalette.Window, QColor('#FADADD'))
-        pal.setColor(QPalette.Inactive, QPalette.Window, QColor('#FADADD')) 
-        self.setPalette(pal) 
+        self.pal = self.palette()
+        self.pal.setBrush(QPalette.Normal, QPalette.Window, QBrush(QPixmap("фон.jpg")))
+        self.pal.setBrush(QPalette.Disabled, QPalette.Window, QBrush(QPixmap("фон.jpg")))
+        self.pal.setBrush(QPalette.Inactive, QPalette.Window, QBrush(QPixmap("фон.jpg")))
+        self.setPalette(self.pal) 
         
         exitAction = QAction(QIcon('exit24.png'), 'Exit', self)
         exitAction.setShortcut('Ctrl+Q')
@@ -275,22 +275,39 @@ class Example(QMainWindow):
         saveFile = QAction(QIcon('open.png'), 'Save', self)
         saveFile.setShortcut('Ctrl+S')
         saveFile.setStatusTip('Save File')
-        saveFile.triggered.connect(self.showSaveDialog)        
+        saveFile.triggered.connect(self.showSaveDialog)
+        
+        colorAction = QAction(QIcon('exit24.png'), 'color', self)
+        colorAction.setStatusTip('color application')
+        colorAction.triggered.connect(self.colore)
         
         menubar = self.menuBar()
-        fileMenu = menubar.addMenu('&File')
+        fileMenu = menubar.addMenu('Файл')
         fileMenu.addAction(exitAction)
         fileMenu.addAction(openFile)
         fileMenu.addAction(saveFile)
+        fileSetUp = menubar.addMenu('Настройки')
+        fileSetUp.addAction(colorAction)
         
         self.resize(1000, 640)
         self.setWindowTitle('Main window')
         self.show()
+        
+    def colore(self):
+        col = QColorDialog.getColor()
+        if col.isValid():
+            self.pal.setColor(QPalette.Normal, QPalette.Window, col)
+            self.setPalette(self.pal)
     def showOpenDialog(self):
-        file = QFileDialog().getOpenFileName(self, 'Открыть файл', '/home', "Images (*.png *.xpm *.jpg);;Text files (*.txt);;XML files (*.xml)")[0]
-        self.MainWidget.image_first = Image.open(file)
-        self.MainWidget.image_second = Image.open(file)
-        self.MainWidget.lbl.setPixmap(showPicture(self.MainWidget.image_first))     
+        try:
+            file = QFileDialog.getOpenFileName(self, 'Открыть файл', '/home', "Images (*.png *.xpm *.jpg);;Text files (*.txt);;XML files (*.xml)")[0]
+            self.MainWidget.image_first = Image.open(file)
+            self.MainWidget.image_second = Image.open(file)
+            self.MainWidget.lbl.setPixmap(showPicture(self.MainWidget.image_first))
+        except Exception:
+            error = QErrorMessage(parent=self)
+            error.showMessage("Сначала начните работу")
+
     def showSaveDialog(self):
         fileName = QFileDialog.getSaveFileName(self , "Сохранить файл"  , "6.jpg",  "*.jpg;;Text files (*.txt);;XML files (*.xml)")
         self.MainWidget.image.save(fileName[0])
