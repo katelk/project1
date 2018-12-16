@@ -251,6 +251,22 @@ class Widget(QWidget):
                     pixels[i, j] = int(r1), int(g1), int(b1)    
         self.lbl.setPixmap(showPicture(self.image))  
         
+        def frame(self):
+            i, okBtnPressed = QInputDialog.getInt(
+                self, "Рамка", "Введите желаемую ширину рамки, а затем ее цвет", 20, 0, 70, 1
+            )
+            if okBtnPressed:
+                color = QColorDialog.getColor()
+                if color.isValid():
+                    im2 = Image.open('j.jpg')
+                    im_two = im2.copy()
+                    old_size = im2.size
+                    x, y = im2.size
+                    new_size = (x + i, y + i)
+                    im2 = Image.new("RGB", new_size, color.name())
+                    im2.paste(im_two, (int((new_size[0] - old_size[0]) / 2), (int((new_size[1] - old_size[1]) / 2))))
+             self.lbl.setPixmap(showPicture(self.image))
+        
 class Example(QMainWindow):
         
     def __init__(self):
