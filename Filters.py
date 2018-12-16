@@ -119,7 +119,7 @@ class Widget(QWidget):
         self.show() 
     
     def anaglif(self):
-        im2 = self.image_first
+        im2 = self.image
         pixels = im2.load()
         x, y = im2.size
         for i in range(y):
@@ -130,13 +130,12 @@ class Widget(QWidget):
                 if q<x:
                     r,g,b = pixels[q,i]
                     pixels[q,i] = r2,g,b
-        self.image_second = self.image_first.copy()
-        self.lbl.setPixmap(showPicture(self.image_second)) 
+        self.lbl.setPixmap(showPicture(self.image)) 
         
     def brightness(self):
         factor, okBtnPressed = QInputDialog.getInt(self, "Яркость", "Введите желаемый показатель яркости", 0, -100, 100, 1)
         if okBtnPressed:
-            im2 = self.image_first
+            im2 = self.image
             pixels = im2.load()
             x, y = im2.size   
             for i in range(x):  
@@ -158,41 +157,39 @@ class Widget(QWidget):
                     if b1 > 255:
                         b1 = 255
                     pixels[i, j] = int(r1), int(g1), int(b1)
-            self.image_second = self.image_first.copy()
-            self.lbl.setPixmap(showPicture(self.image_second))
+            self.lbl.setPixmap(showPicture(self.image))
             
     def contrast(self):
         i, okBtnPressed = QInputDialog.getInt(
             self, "Контрастность", "Введите желаемый показатель контрастности", 0, -100, 100, 1
         )
         if okBtnPressed:
-            contrast = ImageEnhance.Contrast(self.image_first)
+            contrast = ImageEnhance.Contrast(self.image)
             if i < 0:
-                self.image_first = contrast.enhance(1 - ((i * (-1)) / 100))
+                self.image = contrast.enhance(1 - ((i * (-1)) / 100))
             if i > 0:
-                self.image_first = contrast.enhance(1 + (i / 100))
+                self.image = contrast.enhance(1 + (i / 100))
             if i == 0:
-                self.image_first = contrast.enhance(1)
-            self.image_second = self.image_first.copy()
-            self.lbl.setPixmap(showPicture(self.image_second))
+                self.image = contrast.enhance(1)
+            self.lbl.setPixmap(showPicture(self.image))
             
     def saturation(self):
         i, okBtnPressed = QInputDialog.getInt(
             self, "Насыщенность", "Введите желаемый показатель насыщенности", 0, -100, 100, 1
         )
         if okBtnPressed:
-            converter = ImageEnhance.Color(self.image_first)
+            converter = ImageEnhance.Color(self.image)
             if i < 0:
-                self.image_first = converter.enhance(1 - ((i * (-1)) / 100))
+                self.image = converter.enhance(1 - ((i * (-1)) / 100))
             if i > 0:
-                self.image_first = converter.enhance(1 + (i / 100))
+                self.image = converter.enhance(1 + (i / 100))
             if i == 0:
-                self.image_first = converter.enhance(1)
-            self.image_second = self.image_first.copy()
-            self.lbl.setPixmap(showPicture(self.image_second))
+                self.image = converter.enhance(1)
+
+            self.lbl.setPixmap(showPicture(self.image))
                 
     def black_white(self):
-        im2 = self.image_first.copy()
+        im2 = self.image
         pixels = im2.load()
         x, y = im2.size   
         for i in range(x):  
@@ -200,23 +197,19 @@ class Widget(QWidget):
                 r, g, b = pixels[i, j]
                 bw = (r + g + b) // 3
                 pixels[i, j] = bw, bw, bw
-        self.image_second = im2
-        self.lbl.setPixmap(showPicture(self.image_second))
+        self.lbl.setPixmap(showPicture(self.image))
         
     def horizontal_reflection(self):
-        self.image_first = self.image_first.rotate(180)
-        self.image_first = self.image_first.transpose(Image.FLIP_LEFT_RIGHT)
-        self.image_second = self.image_second.rotate(180)
-        self.image_second = self.image_second.transpose(Image.FLIP_LEFT_RIGHT)        
-        self.lbl.setPixmap(showPicture(self.image_second))      
+        self.image = self.image.rotate(180)
+        self.image = self.image.transpose(Image.FLIP_LEFT_RIGHT)       
+        self.lbl.setPixmap(showPicture(self.image))
     
     def vertical_reflection(self):
-        self.image_first = self.image_first.transpose(Image.FLIP_LEFT_RIGHT)
-        self.image_second = self.image_second.transpose(Image.FLIP_LEFT_RIGHT)
-        self.lbl.setPixmap(showPicture(self.image_second)) 
+        self.image = self.image.transpose(Image.FLIP_LEFT_RIGHT)
+        self.lbl.setPixmap(showPicture(self.image)) 
         
     def negative(self):
-        im2 = self.image_first.copy()
+        im2 = self.image
         pixels = im2.load()
         x, y = im2.size   
         for i in range(x):  
@@ -226,15 +219,14 @@ class Widget(QWidget):
                 g1 = 255 - g
                 b1 = 255 - b
                 pixels[i, j] = r1, g1, b1
-        self.image_second = im2
-        self.lbl.setPixmap(showPicture(self.image_second))
+        self.lbl.setPixmap(showPicture(self.image))
     
     def noises(self):
         factor, okBtnPressed = QInputDialog.getInt(
             self, "Зернистость", "Введите желаемый показатель зернистости", 20, 0, 100, 1
         )
         if okBtnPressed:
-            im2 = self.image_first
+            im2 = self.image
             pixels = im2.load()
             x, y = im2.size   
             for i in range(x):  
@@ -257,8 +249,7 @@ class Widget(QWidget):
                     if b1 > 255:
                         b1 = 255
                     pixels[i, j] = int(r1), int(g1), int(b1)    
-        self.image_second = self.image_first.copy()
-        self.lbl.setPixmap(showPicture(self.image_second))  
+        self.lbl.setPixmap(showPicture(self.image))  
         
 class Example(QMainWindow):
         
@@ -296,23 +287,36 @@ class Example(QMainWindow):
         saveFile.setStatusTip('Save File')
         saveFile.triggered.connect(self.showSaveDialog)
         
-        colorAction = QAction('Изменить фон', self)
+        colorAction = QAction('Изменить цвет фона', self)
         colorAction.setStatusTip('')
-        colorAction.triggered.connect(self.colore)
+        colorAction.triggered.connect(self.change_color_fon)
+        
+        fonAction = QAction('Изменить изображение фона', self)
+        fonAction.setStatusTip('')
+        fonAction.triggered.connect(self.change_image_fon)
         
         menubar = self.menuBar()
         fileMenu = menubar.addMenu('Файл')
         fileMenu.addAction(exitAction)
         fileMenu.addAction(openFile)
         fileMenu.addAction(saveFile)
+        
         fileSetUp = menubar.addMenu('Настройки')
         fileSetUp.addAction(colorAction)
+        fileSetUp.addAction(fonAction)
         
         self.resize(1000, 640)
         self.setWindowTitle('Main window')
         self.show()
-        
-    def colore(self):
+    
+    def change_image_fon(self):
+        file = QFileDialog.getOpenFileName(self, 'Открыть файл', '/home', "*.jpg;;*.bmp;;*.png")[0]
+        self.pal.setBrush(QPalette.Normal, QPalette.Window, QBrush(QPixmap(file[0])))
+        self.pal.setBrush(QPalette.Disabled, QPalette.Window, QBrush(QPixmap(file[0])))
+        self.pal.setBrush(QPalette.Inactive, QPalette.Window, QBrush(QPixmap(file[0])))
+        self.setPalette(self.pal)
+            
+    def change_color_fon(self):
         col = QColorDialog.getColor()
         if col.isValid():
             self.pal.setColor(QPalette.Normal, QPalette.Window, col)
@@ -321,17 +325,20 @@ class Example(QMainWindow):
             self.setPalette(self.pal)
     def showOpenDialog(self):
         try:
-            file = QFileDialog.getOpenFileName(self, 'Открыть файл', '/home', "Images (*.png *.xpm *.jpg);;Text files (*.txt);;XML files (*.xml)")[0]
-            self.MainWidget.image_first = Image.open(file)
-            self.MainWidget.image_second = Image.open(file)
-            self.MainWidget.lbl.setPixmap(showPicture(self.MainWidget.image_first))
+            file = QFileDialog.getOpenFileName(self, 'Открыть файл', '/home', "*.jpg;;*.bmp;;*.png")[0]
+            self.MainWidget.image = Image.open(file)
+            self.MainWidget.lbl.setPixmap(showPicture(self.MainWidget.image))
         except Exception:
             error = QErrorMessage(parent=self)
-            error.showMessage("Сначала начните работу")
+            error.showMessage("Ошибка")
 
     def showSaveDialog(self):
-        fileName = QFileDialog.getSaveFileName(self , "Сохранить файл"  , "6.jpg",  "*.jpg;;Text files (*.txt);;XML files (*.xml)")
-        self.MainWidget.image.save(fileName[0])
+        try:
+            fileName = QFileDialog.getSaveFileName(self , "Сохранить файл"  , "untitled.jpg",  "*.jpg;;*.bmp;;*.png")
+            self.MainWidget.image.save(fileName[0])
+        except Exception:
+            error = QErrorMessage(parent=self)
+            error.showMessage("Ошибка")
  
 if __name__ == '__main__':
         
