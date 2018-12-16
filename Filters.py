@@ -291,7 +291,8 @@ class Widget(QWidget):
                 x, y = im2.size
                 new_size = (x + i, y + i)
                 im2 = Image.new("RGB", new_size, color.name())
-                im2.paste(im_two, (int((new_size[0] - old_size[0]) / 2), (int((new_size[1] - old_size[1]) / 2))))
+                im2.paste(im_two, (int((new_size[0] - old_size[0]) / 2),
+                                   (int((new_size[1] - old_size[1]) / 2))))
                 self.image = im2
         self.lbl.setPixmap(showPicture(self.image))
 
@@ -388,7 +389,7 @@ class Example(QMainWindow):
 
     def change_image_fon(self):
         file = QFileDialog.getOpenFileName(self, 'Открыть файл', '/home',
-                                           "*.jpg;;*.bmp;;*.png")[0]
+                                           "*.jpg;;*.bmp;;*.png")
         self.pal.setBrush(QPalette.Normal, QPalette.Window,
                           QBrush(QPixmap(file[0])))
         self.pal.setBrush(QPalette.Disabled, QPalette.Window,
