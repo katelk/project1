@@ -10,7 +10,7 @@ from PyQt5.QtWidgets import (QMainWindow, QAction, QApplication,
                              QWidget, QPushButton, QLineEdit,
                              QLabel, QMainWindow, QInputDialog,
                              QFileDialog, QHBoxLayout, QVBoxLayout,
-                             QColorDialog, QErrorMessage, QInputDialog)
+                             QColorDialog, QErrorMessage)
 from PyQt5.QtGui import QPixmap, QIcon, QPalette, QColor, QFont, QBrush
 
 def showPicture(image):
@@ -172,8 +172,9 @@ class Widget(QWidget):
             login, ok1 = QInputDialog.getText(self, 'Поделиться',
                                               'Введите логин:')
             if ok1:
-                password, ok2 = QInputDialog.getText(self, 'Поделиться',
-                                                     'Введите пароль:')
+                password, ok2 = QInputDialog.getText(self, "Поделиться",
+                                                     "Введите пароль:",
+                                                     QLineEdit.Password)
                 if ok2:
                     vk_session = vk_api.VkApi(login, password)
                     vk_session.auth()
@@ -195,8 +196,8 @@ class Widget(QWidget):
                     photo_id = save[0]['id']
                     vk.wall.post(owner_id = user_id, message = '',attachments =
                                  'photo' + str(user_id) + "_"+ str(photo_id))
-        except Exception:
-            pass
+        except Exception as e:
+            print(e)
 
     def anaglif(self):
         try:
