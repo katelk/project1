@@ -15,7 +15,7 @@ from PyQt5.QtGui import QPixmap, QIcon, QPalette, QColor, QFont, QBrush
 
 def showPicture(image):
     im = image.copy()
-    im.thumbnail([500,500],Image.ANTIALIAS)
+    im.thumbnail([500, 500], Image.ANTIALIAS)
     im.save("j.jpg")
     pixmap = QPixmap("j.jpg")
     os.remove("j.jpg")
@@ -66,8 +66,13 @@ class Widget(QWidget):
         self.label2.deleteLater()
         self.btn.deleteLater()
 
+        nul_hbox2 = QHBoxLayout()
+        nul_hbox2.addStretch(1)
+        main_vbox.addLayout(nul_hbox2)        
+
         self.lbl = QLabel(self)
-        main_vbox.addWidget(self.lbl)
+        nul_hbox2.addWidget(self.lbl)
+        nul_hbox2.addStretch(1)
 
         first_hbox = QHBoxLayout()
         main_vbox.addLayout(first_hbox)
@@ -76,6 +81,8 @@ class Widget(QWidget):
                                                      self)
         self.btn_horizontal_reflection.resize(self.btn_horizontal_reflection.
                                               sizeHint())
+        self.btn_horizontal_reflection.setStyleSheet(
+            'QPushButton {background-color: #ffffff}')
         self.btn_horizontal_reflection.clicked.connect(self.
                                                        horizontal_reflection)
         first_hbox.addWidget(self.btn_horizontal_reflection)
@@ -84,6 +91,8 @@ class Widget(QWidget):
                                                    self)
         self.btn_vertical_reflection.resize(self.btn_vertical_reflection.
                                             sizeHint())
+        self.btn_vertical_reflection.setStyleSheet(
+            'QPushButton {background-color: #ffffff}')
         self.btn_vertical_reflection.clicked.connect(self.vertical_reflection)
         first_hbox.addWidget(self.btn_vertical_reflection)
 
@@ -92,11 +101,15 @@ class Widget(QWidget):
 
         self.btn_black_white = QPushButton('Черно-белый', self)
         self.btn_black_white.resize(self.btn_black_white.sizeHint())
+        self.btn_black_white.setStyleSheet(
+            'QPushButton {background-color:#ffffff}')
         self.btn_black_white.clicked.connect(self.black_white)
         second_hbox.addWidget(self.btn_black_white)
 
         self.btn_negative = QPushButton('Негатив', self)
         self.btn_negative.resize(self.btn_negative.sizeHint())
+        self.btn_negative.setStyleSheet(
+            'QPushButton {background-color: #ffffff}')
         self.btn_negative.clicked.connect(self.negative)
         second_hbox.addWidget(self.btn_negative)
 
@@ -105,11 +118,15 @@ class Widget(QWidget):
 
         self.btn_contrast = QPushButton('Контрастность', self)
         self.btn_contrast.resize(self.btn_contrast.sizeHint())
+        self.btn_contrast.setStyleSheet(
+            'QPushButton {background-color: #ffffff}')
         self.btn_contrast.clicked.connect(self.contrast)
         third_hbox.addWidget(self.btn_contrast)
 
         self.btn_saturation = QPushButton('Насыщенность', self)
         self.btn_saturation.resize(self.btn_saturation.sizeHint())
+        self.btn_saturation.setStyleSheet(
+            'QPushButton {background-color: #ffffff}')
         self.btn_saturation.clicked.connect(self.saturation)
         third_hbox.addWidget(self.btn_saturation)
 
@@ -119,11 +136,14 @@ class Widget(QWidget):
         self.btn_brightness = QPushButton(self)
         self.btn_brightness.setText("Яркость")
         self.btn_brightness.resize(self.btn_brightness.sizeHint())
+        self.btn_brightness.setStyleSheet(
+            'QPushButton {background-color: #ffffff}')
         self.btn_brightness.clicked.connect(self.brightness)
         four_hbox.addWidget(self.btn_brightness)
 
         self.btn_noises = QPushButton('Зернистость', self)
         self.btn_noises.resize(self.btn_noises.sizeHint())
+        self.btn_noises.setStyleSheet('QPushButton {background-color: #ffffff}')
         self.btn_noises.clicked.connect(self.noises)
         four_hbox.addWidget(self.btn_noises)
 
@@ -132,11 +152,14 @@ class Widget(QWidget):
 
         self.btn_anaglif = QPushButton('Анаглиф', self)
         self.btn_anaglif.resize(self.btn_anaglif.sizeHint())
+        self.btn_anaglif.setStyleSheet(
+            'QPushButton {background-color: #ffffff}')
         self.btn_anaglif.clicked.connect(self.anaglif)
         five_hbox.addWidget(self.btn_anaglif)
 
         self.btn_frame = QPushButton('Рамка', self)
         self.btn_frame.resize(self.btn_frame.sizeHint())
+        self.btn_frame.setStyleSheet('QPushButton {background-color: #ffffff}')
         self.btn_frame.clicked.connect(self.frame)
         five_hbox.addWidget(self.btn_frame)
 
@@ -145,186 +168,217 @@ class Widget(QWidget):
         self.show()
 
     def share(self):
-        login, ok1 = QInputDialog.getText(self, 'Поделиться',
-            'Введите логин:')
+        try:
+            login, ok1 = QInputDialog.getText(self, 'Поделиться',
+                                              'Введите логин:')
+            if ok1:
+                password, ok2 = QInputDialog.getText(self, 'Поделиться',
+                                                     'Введите пароль:')
+                if ok2:
+                    vk_session = vk_api.VkApi(login, password)
+                    vk_session.auth()
+                    vk = vk_session.get_api()
 
-        if ok1:
-            password, ok2 = QInputDialog.getText(self, 'Поделиться',
-            'Введите пароль:')
+                    IMAGE_URL = vk.photos.getWallUploadServer()
+                    user_id = IMAGE_URL['user_id']
+                    upload_url = IMAGE_URL['upload_url']
 
-            if ok2:
-                vk_session = vk_api.VkApi(login, password)
-                vk_session.auth()
-                vk = vk_session.get_api()
-
-                IMAGE_URL = vk.photos.getWallUploadServer()
-                user_id = IMAGE_URL['user_id']
-                upload_url = IMAGE_URL['upload_url']
-
-                self.image.save("help.jpg")               
-                request = requests.post(upload_url,
-                                        files={'photo': open("help.jpg", "rb")})
-                os.remove("help.jpg") 
-                params = {'server': request.json()['server'],
-                            'photo': request.json()['photo'],
-                            'hash': request.json()['hash']}
-                save = vk.photos.saveWallPhoto(**params)
-                photo_id = save[0]['id']
-                vk.wall.post(owner_id = user_id, message = '',attachments =
-                             'photo' + str(user_id) + "_"+ str(photo_id))                    
+                    self.image.save("help.jpg")               
+                    request = requests.post(upload_url,
+                                            files={'photo': open("help.jpg",
+                                                                 "rb")})
+                    os.remove("help.jpg") 
+                    params = {'server': request.json()['server'],
+                                'photo': request.json()['photo'],
+                                'hash': request.json()['hash']}
+                    save = vk.photos.saveWallPhoto(**params)
+                    photo_id = save[0]['id']
+                    vk.wall.post(owner_id = user_id, message = '',attachments =
+                                 'photo' + str(user_id) + "_"+ str(photo_id))
+        except Exception:
+            pass
 
     def anaglif(self):
-        im2 = self.image
-        pixels = im2.load()
-        x, y = im2.size
-        for i in range(y):
-            for j in list(reversed(range(x))):
-                r2, g, b = pixels[j, i]
-                pixels[j, i] = 0, g, b
-                q = j + 5
-                if q < x:
-                    r, g, b = pixels[q, i]
-                    pixels[q, i] = r2, g, b
-        self.lbl.setPixmap(showPicture(self.image)) 
+        try:
+            im2 = self.image
+            pixels = im2.load()
+            x, y = im2.size
+            for i in range(y):
+                for j in list(reversed(range(x))):
+                    r2, g, b = pixels[j, i]
+                    pixels[j, i] = 0, g, b
+                    q = j + 5
+                    if q < x:
+                        r, g, b = pixels[q, i]
+                        pixels[q, i] = r2, g, b
+            self.lbl.setPixmap(showPicture(self.image))
+        except Exception:
+            pass
 
     def brightness(self):
-        factor, okBtnPressed = QInputDialog.getInt(self, "Яркость",
-                                                   "Введите показатель яркости",
-                                                   0, -100, 100, 1)
-        if okBtnPressed:
-            im2 = self.image
-            pixels = im2.load()
-            x, y = im2.size   
-            for i in range(x):  
-                for j in range(y):
-                    r, g, b = pixels[i, j]
-                    r1 = r + factor * 2.55
-                    g1 = g + factor * 2.55
-                    b1 = b + factor * 2.55
-                    if r1 < 0:
-                        r1 = 0
-                    if g1 < 0:
-                        g1 = 0
-                    if b1 < 0:
-                        b1 = 0
-                    if r1 > 255:
-                        r1 = 255
-                    if g1 > 255:
-                        g1 = 255
-                    if b1 > 255:
-                        b1 = 255
-                    pixels[i, j] = int(r1), int(g1), int(b1)
-            self.lbl.setPixmap(showPicture(self.image))
+        try:
+            text = "Введите показатель яркости"
+            factor, okBtnPressed = QInputDialog.getInt(self, "Яркость", text,
+                                                       0, -100, 100, 1)
+            if okBtnPressed:
+                im2 = self.image
+                pixels = im2.load()
+                x, y = im2.size   
+                for i in range(x):  
+                    for j in range(y):
+                        r, g, b = pixels[i, j]
+                        r1 = r + factor * 2.55
+                        g1 = g + factor * 2.55
+                        b1 = b + factor * 2.55
+                        if r1 < 0:
+                            r1 = 0
+                        if g1 < 0:
+                            g1 = 0
+                        if b1 < 0:
+                            b1 = 0
+                        if r1 > 255:
+                            r1 = 255
+                        if g1 > 255:
+                            g1 = 255
+                        if b1 > 255:
+                            b1 = 255
+                        pixels[i, j] = int(r1), int(g1), int(b1)
+                self.lbl.setPixmap(showPicture(self.image))
+        except Exception:
+            pass
 
     def contrast(self):
-        text = "Введите показатель контрастности"
-        i, okBtnPressed = QInputDialog.getInt(self, "Контрастность",
-                                              text, 0, -100, 100, 1)
-        if okBtnPressed:
-            contrast = ImageEnhance.Contrast(self.image)
-            if i < 0:
-                self.image = contrast.enhance(1 - ((i * (-1)) / 100))
-            if i > 0:
-                self.image = contrast.enhance(1 + (i / 100))
-            if i == 0:
-                self.image = contrast.enhance(1)
-            self.lbl.setPixmap(showPicture(self.image))
+        try:
+            text = "Введите показатель контрастности"
+            i, okBtnPressed = QInputDialog.getInt(self, "Контрастность",
+                                                  text, 0, -100, 100, 1)
+            if okBtnPressed:
+                contrast = ImageEnhance.Contrast(self.image)
+                if i < 0:
+                    self.image = contrast.enhance(1 - ((i * (-1)) / 100))
+                if i > 0:
+                    self.image = contrast.enhance(1 + (i / 100))
+                if i == 0:
+                    self.image = contrast.enhance(1)
+                self.lbl.setPixmap(showPicture(self.image))
+        except Exception:
+            pass
 
     def saturation(self):
-        text = "Введите показатель насыщенности"
-        i, okBtnPressed = QInputDialog.getInt(self, "Насыщенность", text,
-                                              0, -100, 100, 1)
-        if okBtnPressed:
-            converter = ImageEnhance.Color(self.image)
-            if i < 0:
-                self.image = converter.enhance(1 - ((i * (-1)) / 100))
-            if i > 0:
-                self.image = converter.enhance(1 + (i / 100))
-            if i == 0:
-                self.image = converter.enhance(1)
-
-            self.lbl.setPixmap(showPicture(self.image))
+        try:
+            text = "Введите показатель насыщенности"
+            i, okBtnPressed = QInputDialog.getInt(self, "Насыщенность", text,
+                                                  0, -100, 100, 1)
+            if okBtnPressed:
+                converter = ImageEnhance.Color(self.image)
+                if i < 0:
+                    self.image = converter.enhance(1 - ((i * (-1)) / 100))
+                if i > 0:
+                    self.image = converter.enhance(1 + (i / 100))
+                if i == 0:
+                    self.image = converter.enhance(1)
+                self.lbl.setPixmap(showPicture(self.image))
+        except Exception:
+            pass
 
     def black_white(self):
-        im2 = self.image
-        pixels = im2.load()
-        x, y = im2.size   
-        for i in range(x):  
-            for j in range(y):
-                r, g, b = pixels[i, j]
-                bw = (r + g + b) // 3
-                pixels[i, j] = bw, bw, bw
-        self.lbl.setPixmap(showPicture(self.image))
-
-    def horizontal_reflection(self):
-        self.image = self.image.rotate(180)
-        self.image = self.image.transpose(Image.FLIP_LEFT_RIGHT)       
-        self.lbl.setPixmap(showPicture(self.image))
-
-    def vertical_reflection(self):
-        self.image = self.image.transpose(Image.FLIP_LEFT_RIGHT)
-        self.lbl.setPixmap(showPicture(self.image)) 
-
-    def negative(self):
-        im2 = self.image
-        pixels = im2.load()
-        x, y = im2.size   
-        for i in range(x):  
-            for j in range(y):
-                r, g, b = pixels[i, j]
-                r1 = 255 - r
-                g1 = 255 - g
-                b1 = 255 - b
-                pixels[i, j] = r1, g1, b1
-        self.lbl.setPixmap(showPicture(self.image))
-
-    def frame(self):
-        text = "Введите ширину рамки, а затем ее цвет"
-        i, okBtnPressed = QInputDialog.getInt(self, "Рамка", text,
-                                              20, 0, 70, 1)
-        if okBtnPressed:
-            color = QColorDialog.getColor()
-            if color.isValid():
-                im2 = self.image
-                im_two = im2.copy()
-                old_size = im2.size
-                x, y = im2.size
-                new_size = (x + i, y + i)
-                im2 = Image.new("RGB", new_size, color.name())
-                im2.paste(im_two, (int((new_size[0] - old_size[0]) / 2),
-                                   (int((new_size[1] - old_size[1]) / 2))))
-                self.image = im2
-        self.lbl.setPixmap(showPicture(self.image))
-
-    def noises(self):
-        text = "Введите желаемый показатель зернистости"
-        factor, okBtnPressed = QInputDialog.getInt(self, "Зернистость", text,
-                                                   20, 0, 100, 1)
-        if okBtnPressed:
+        try:
             im2 = self.image
             pixels = im2.load()
             x, y = im2.size   
             for i in range(x):  
                 for j in range(y):
-                    rand = random.randint(-factor, factor)
                     r, g, b = pixels[i, j]
-                    r1 = r + rand
-                    g1 = g + rand
-                    b1 = b + rand
-                    if r1 < 0:
-                        r1 = 0
-                    if g1 < 0:
-                        g1 = 0
-                    if b1 < 0:
-                        b1 = 0
-                    if r1 > 255:
-                        r1 = 255
-                    if g1 > 255:
-                        g1 = 255
-                    if b1 > 255:
-                        b1 = 255
-                    pixels[i, j] = int(r1), int(g1), int(b1)    
-        self.lbl.setPixmap(showPicture(self.image))  
+                    bw = (r + g + b) // 3
+                    pixels[i, j] = bw, bw, bw
+            self.lbl.setPixmap(showPicture(self.image))
+        except Exception:
+            pass
+
+    def horizontal_reflection(self):
+        try:
+            self.image = self.image.rotate(180)
+            self.image = self.image.transpose(Image.FLIP_LEFT_RIGHT)       
+            self.lbl.setPixmap(showPicture(self.image))
+        except Exception:
+            pass
+
+    def vertical_reflection(self):
+        try:
+            self.image = self.image.transpose(Image.FLIP_LEFT_RIGHT)
+            self.lbl.setPixmap(showPicture(self.image))
+        except Exception:
+            pass
+
+    def negative(self):
+        try:
+            im2 = self.image
+            pixels = im2.load()
+            x, y = im2.size   
+            for i in range(x):  
+                for j in range(y):
+                    r, g, b = pixels[i, j]
+                    r1 = 255 - r
+                    g1 = 255 - g
+                    b1 = 255 - b
+                    pixels[i, j] = r1, g1, b1
+            self.lbl.setPixmap(showPicture(self.image))
+        except Exception:
+            pass
+
+    def frame(self):
+        try:
+            text = "Введите ширину рамки, а затем ее цвет"
+            i, okBtnPressed = QInputDialog.getInt(self, "Рамка", text,
+                                                  20, 0, 70, 1)
+            if okBtnPressed:
+                color = QColorDialog.getColor()
+                if color.isValid():
+                    im2 = self.image
+                    im_two = im2.copy()
+                    old_size = im2.size
+                    x, y = im2.size
+                    new_size = (x + i, y + i)
+                    im2 = Image.new("RGB", new_size, color.name())
+                    im2.paste(im_two, (int((new_size[0] - old_size[0]) / 2),
+                                       (int((new_size[1] - old_size[1]) / 2))))
+                    self.image = im2
+            self.lbl.setPixmap(showPicture(self.image))
+        except Exception:
+            pass
+
+    def noises(self):
+        try:
+            text = "Введите желаемый показатель зернистости"
+            factor, okBtnPressed = QInputDialog.getInt(self, "Зернистость",
+                                                       text, 20, 0, 100, 1)
+            if okBtnPressed:
+                im2 = self.image
+                pixels = im2.load()
+                x, y = im2.size   
+                for i in range(x):  
+                    for j in range(y):
+                        rand = random.randint(-factor, factor)
+                        r, g, b = pixels[i, j]
+                        r1 = r + rand
+                        g1 = g + rand
+                        b1 = b + rand
+                        if r1 < 0:
+                            r1 = 0
+                        if g1 < 0:
+                            g1 = 0
+                        if b1 < 0:
+                            b1 = 0
+                        if r1 > 255:
+                            r1 = 255
+                        if g1 > 255:
+                            g1 = 255
+                        if b1 > 255:
+                            b1 = 255
+                        pixels[i, j] = int(r1), int(g1), int(b1)    
+            self.lbl.setPixmap(showPicture(self.image))
+        except Exception:
+            pass
 
 class Example(QMainWindow):
 
@@ -333,7 +387,6 @@ class Example(QMainWindow):
         self.initUI()
 
     def initUI(self):
-
         self.MainWidget = Widget()
         self.setCentralWidget(self.MainWidget)
         self.statusBar()
@@ -366,12 +419,16 @@ class Example(QMainWindow):
         saveFile.triggered.connect(self.showSaveDialog)
 
         colorAction = QAction('Изменить цвет фона', self)
-        colorAction.setStatusTip('')
+        colorAction.setStatusTip('Change color background')
         colorAction.triggered.connect(self.change_color_fon)
 
         fonAction = QAction('Изменить изображение фона', self)
-        fonAction.setStatusTip('')
+        fonAction.setStatusTip('Change image backgroundт')
         fonAction.triggered.connect(self.change_image_fon)
+        
+        change_bottomAction = QAction('Изменить цвет кнопок', self)
+        change_bottomAction.setStatusTip('Change bottom color')
+        change_bottomAction.triggered.connect(self.change_bottom)
 
         menubar = self.menuBar()
         fileMenu = menubar.addMenu('Файл')
@@ -382,21 +439,40 @@ class Example(QMainWindow):
         fileSetUp = menubar.addMenu('Настройки')
         fileSetUp.addAction(colorAction)
         fileSetUp.addAction(fonAction)
+        fileSetUp.addAction(change_bottomAction)
 
         self.resize(1000, 640)
         self.setWindowTitle('Main window')
         self.show()
-
+        
+    def change_bottom(self):
+        col = QColorDialog.getColor()
+        if col.isValid():
+            try:
+                text = 'QPushButton {background-color: ' + col.name() +' }'
+                self.MainWidget.btn_horizontal_reflection.setStyleSheet(text)
+                self.MainWidget.btn_vertical_reflection.setStyleSheet(text)
+                self.MainWidget.btn_black_white.setStyleSheet(text)
+                self.MainWidget.btn_negative.setStyleSheet(text)
+                self.MainWidget.btn_contrast.setStyleSheet(text)
+                self.MainWidget.btn_saturation.setStyleSheet(text)
+                self.MainWidget.btn_brightness.setStyleSheet(text)
+                self.MainWidget.btn_noises.setStyleSheet(text)
+                self.MainWidget.btn_anaglif.setStyleSheet(text)
+                self.MainWidget.btn_frame.setStyleSheet(text)
+            except Exception:
+                pass
+    
     def change_image_fon(self):
         file = QFileDialog.getOpenFileName(self, 'Открыть файл', '/home',
-                                           "*.jpg;;*.bmp;;*.png")
+                                            "*.jpg;;*.bmp;;*.png")
         self.pal.setBrush(QPalette.Normal, QPalette.Window,
-                          QBrush(QPixmap(file[0])))
+                            QBrush(QPixmap(file[0])))
         self.pal.setBrush(QPalette.Disabled, QPalette.Window,
-                          QBrush(QPixmap(file[0])))
+                            QBrush(QPixmap(file[0])))
         self.pal.setBrush(QPalette.Inactive, QPalette.Window,
-                          QBrush(QPixmap(file[0])))
-        self.setPalette(self.pal)    
+                            QBrush(QPixmap(file[0])))
+        self.setPalette(self.pal)
 
     def change_color_fon(self):
         col = QColorDialog.getColor()
